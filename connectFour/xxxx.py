@@ -1,7 +1,28 @@
 import pgzrun
-import pygame
 import math
 
+WIDTH = 700
+HEIGHT = 620
+white = (255, 255, 255)
+red = (200, 35, 35)
+yellow = (197, 186, 34)
+bgcolor = (28, 28, 160)
+stage = 0
+_COL = 7
+_ROW = 6
+tilestatus = [
+    [0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0]
+]
+endgame = False
+text = ''
+
+def drawCircle(x, y,color):
+    screen.draw.filled_circle((x,y), 40, color)
 
 def updatecircle():
     tileposx = 50
@@ -12,12 +33,11 @@ def updatecircle():
             if j == 1: tilecolour = yellow
             elif j == 2: tilecolour = red
             else: tilecolour = white    #init
-            drawcircle(tileposx, tileposy, tilecolour)
+            drawCircle(tileposx, tileposy, tilecolour)
             tileposx += 100
         tileposy += 100
         tileposx = 50
-def drawcircle(x_pos, y_pos, color):
-    pygame.draw.circle(screen, color, (x_pos, y_pos), 40)
+
 def tileflip(x):
     settile = 0
     global tilestatus
@@ -32,6 +52,7 @@ def tileflip(x):
         if tilestatus[findrow][x] == 0 or findrow == _ROW-1:
             tilestatus[findrow][x] = settile
             return findrow
+
 def checkwinner(ro, co):
     winner = tilestatus[ro][co] #inherited player
     lcount = 0
@@ -94,68 +115,38 @@ def checkwinner(ro, co):
             if k == 4: return winner
         else: break
     return 0    #no winner yet
-def settext(check):
-    global textsurface
+
+def setText(who_won):
     global endgame
-    if check == 1 and endgame == False:
-        textsurface = myfont.render('Winner is Yellow', False, (0, 0, 0))
+    global text
+    if endgame:
+        text = 'Game Finished -- Try new Game'
+    elif who_won == 1 and endgame == False:
+        text = 'Winner is Yellow'
         endgame = True
-    elif check == 2 and endgame == False:
-        textsurface = myfont.render('Winner is Red', False, (0, 0, 0))
+    elif who_won == 2 and endgame == False:
+        text = 'Winner is Red'
         endgame = True
-    elif endgame:
-        textsurface = myfont.render('Game Finished -- Try new Game', False, (0, 0, 0))
 
 
-
-
-
-pygame.font.init()
-myfont = pygame.font.SysFont('Comic Sans MS', 12)
-textsurface = myfont.render('', False, (0, 0, 0))
-
-width = 700
-height = 620
-white = (255, 255, 255)
-red = (200, 35, 35)
-yellow = (197, 186, 34)
-bgcolor = (28, 28, 160)
-stage = 0
-_COL = 7
-_ROW = 6
-tilestatus = [
-    [0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0]
-]
-endgame = False
-
-screen = pygame.display.set_mode((width, height))
-clock = pygame.time.Clock()
-# pygame.init()
-# pygame.display.set_caption("Simple PyGame Example")
-
-while True:
-    
-    clock.tick(60)
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            sys.exit()
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            if endgame:
-                settext(0)
-                break
-            cur_ro = tileflip(math.floor(event.pos[0]/100))
-            settext(checkwinner(cur_ro, math.floor(event.pos[0]/100)))
-
-    screen.fill(bgcolor)
-    pygame.draw.rect(screen, white, [0,600,width,20])
-    screen.blit(textsurface,(5,600))
+def draw():
+    screen.fill(white)
+    tilebgrct = Rect((0,0),(WIDTH,HEIGHT-20))
+    screen.draw.filled_rect(tilebgrct,bgcolor)
     updatecircle()
-    pygame.display.update()
+    screen.draw.text(text, (0, 600), color=(0, 0, 0), background="white")
+
+def update():
+    pass
+
+def on_mouse_down(pos):
+    global endgame
+    if endgame:
+        setText(0)
+    else:
+        xpos = math.floor(pos[0]/100)
+        to_check_ypos = tileflip(xpos)
+        who_won = checkwinner(to_check_ypos,xpos)
+        setText(who_won)
 
 pgzrun.go()

@@ -1,7 +1,24 @@
 import pgzrun
-import pygame
 import math
 
+width = 700
+height = 620
+white = (255, 255, 255)
+red = (200, 35, 35)
+yellow = (197, 186, 34)
+bgcolor = (28, 28, 160)
+stage = 0
+_COL = 7
+_ROW = 6
+tilestatus = [
+    [0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0]
+]
+endgame = False
 
 def updatecircle():
     tileposx = 50
@@ -17,7 +34,7 @@ def updatecircle():
         tileposy += 100
         tileposx = 50
 def drawcircle(x_pos, y_pos, color):
-    pygame.draw.circle(screen, color, (x_pos, y_pos), 40)
+    screen.draw.circle(color, (x_pos, y_pos), 40)
 def tileflip(x):
     settile = 0
     global tilestatus
@@ -107,55 +124,31 @@ def settext(check):
         textsurface = myfont.render('Game Finished -- Try new Game', False, (0, 0, 0))
 
 
-
-
-
-pygame.font.init()
-myfont = pygame.font.SysFont('Comic Sans MS', 12)
-textsurface = myfont.render('', False, (0, 0, 0))
-
-width = 700
-height = 620
-white = (255, 255, 255)
-red = (200, 35, 35)
-yellow = (197, 186, 34)
-bgcolor = (28, 28, 160)
-stage = 0
-_COL = 7
-_ROW = 6
-tilestatus = [
-    [0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0]
-]
-endgame = False
-
-screen = pygame.display.set_mode((width, height))
-clock = pygame.time.Clock()
-# pygame.init()
-# pygame.display.set_caption("Simple PyGame Example")
-
-while True:
-    
-    clock.tick(60)
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            sys.exit()
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            if endgame:
-                settext(0)
-                break
-            cur_ro = tileflip(math.floor(event.pos[0]/100))
-            settext(checkwinner(cur_ro, math.floor(event.pos[0]/100)))
-
+def draw():
+    # background set
     screen.fill(bgcolor)
-    pygame.draw.rect(screen, white, [0,600,width,20])
-    screen.blit(textsurface,(5,600))
-    updatecircle()
-    pygame.display.update()
+    # tile set
+    tileposx = 50
+    tileposy = 50
+    for i in reversed(tilestatus):
+        for j in i:
+            if j == 1: tilecolour = yellow
+            elif j == 2: tilecolour = red
+            else: tilecolour = white    # 0 == init
+            screen.draw.circle((tileposx,tileposy),40,tilecolour)
+            tileposx += 100
+        tileposy += 100
+        tileposx = 50    
+    # text
+    screen.draw.filled_rect(0,600,width,20,white)
+    screen.draw.text("no",(5,600))
+def update():
+    pass
+
+def on_mouse_down(pos):
+    if endgame:
+        settext(0)
+    else:
+        settext(checkwinner(tileflip(math.floor(event.pos[0]/100)),math.floor(event.pos[0]/100))
 
 pgzrun.go()
